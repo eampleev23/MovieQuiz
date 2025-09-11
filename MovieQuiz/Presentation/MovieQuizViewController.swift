@@ -2,19 +2,19 @@ import UIKit
 
 final class MovieQuizViewController: UIViewController {
     
-    struct QuizResultsViewModel {
+    private struct QuizResultsViewModel {
         let title: String
         let text: String
         let buttonText: String
     }
     
-    struct QuizQuestion {
+    private struct QuizQuestion {
         let image:String
         let text:String
         let correctAnswer:Bool
     }
 
-    struct QuizStepViewModel {
+    private struct QuizStepViewModel {
         let image:UIImage
         let question:String
         let questionNumber:String
@@ -81,7 +81,7 @@ final class MovieQuizViewController: UIViewController {
         super.viewDidLoad()
     }
     
-    @IBAction func yesButtonClicked(_ sender: UIButton) {
+    @IBAction private func yesButtonClicked(_ sender: UIButton) {
         if questions[currentQuestionIndex].correctAnswer == true {
             showAnswerResult(isCorrect: true)
         }else{
@@ -89,7 +89,7 @@ final class MovieQuizViewController: UIViewController {
         }
     }
     
-    @IBAction func noButtonClicked(_ sender: UIButton) {
+    @IBAction private func noButtonClicked(_ sender: UIButton) {
         if questions[currentQuestionIndex].correctAnswer == false {
             showAnswerResult(isCorrect: true)
         }else{
