@@ -24,6 +24,12 @@ final class MovieQuizViewController: UIViewController {
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var imageView: UIImageView!
     
+    private let initialQuestionIndex = 0
+    private let initialCorrectAnswers = 0
+    private let finalTitleAlert = "Этот раунд окончен!"
+    private let finalBtnAlertText = "Сыграть еще раз"
+    private let timeForShowBorder = 1.0
+    
     private let questions: [QuizQuestion] = [
             QuizQuestion(
                 image: "The Godfather",
@@ -99,8 +105,8 @@ final class MovieQuizViewController: UIViewController {
             preferredStyle: .alert)
             
         let action = UIAlertAction(title: result.buttonText, style: .default) { _ in
-            self.currentQuestionIndex = 0
-            self.correctAnswers = 0
+            self.currentQuestionIndex = self.initialQuestionIndex
+            self.correctAnswers = self.initialCorrectAnswers
             
             let firstQuestion = self.questions[self.currentQuestionIndex]
             let viewModel = self.convert(model: firstQuestion)
@@ -135,7 +141,7 @@ final class MovieQuizViewController: UIViewController {
         imageView.layer.cornerRadius = 6
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0){
+        DispatchQueue.main.asyncAfter(deadline: .now() + timeForShowBorder){
             self.imageView.layer.borderWidth = 0
             self.showNextQuestionOrResult()
         }
@@ -145,11 +151,11 @@ final class MovieQuizViewController: UIViewController {
         
         if currentQuestionIndex == questions.count - 1 {
             
-            let text = "Ваш результат: \(correctAnswers)/10"
+            let text = "Ваш результат: \(correctAnswers)/\(questions.count)"
             let viewModel = QuizResultsViewModel(
-                title: "Этот раунд окончен!",
+                title: finalTitleAlert,
                 text: text,
-                buttonText: "Сыграть еще раз")
+                buttonText: finalBtnAlertText)
             show(quiz: viewModel)
         
         } else {
