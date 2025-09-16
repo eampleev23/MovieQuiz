@@ -70,6 +70,8 @@ final class MovieQuizViewController: UIViewController {
         let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
             
             guard let self = self else { return }
+            self.currentQuestionIndex = self.initialQuestionIndex
+            self.correctAnswers = self.initialCorrectAnswers
             guard let currentQuestion = currentQuestion else { return }
             
             let firstQuestion = currentQuestion
@@ -134,6 +136,7 @@ final class MovieQuizViewController: UIViewController {
             currentQuestionIndex += 1
             
             if let nextQuestion = questionFactory.requestNextQuestion() {
+                currentQuestion = nextQuestion
                 let viewModel = convert(model: nextQuestion)
                 show(quiz: viewModel)
             }
