@@ -16,7 +16,7 @@ final class MovieQuizViewController: UIViewController {
     
     // Свойства для рефакторинга
     private let questionsAmount: Int = 10
-    private var questionFactory: QuestionFactory = QuestionFactory()
+    private var questionFactory: QuestionFactoryProtocol = QuestionFactory()
     private var currentQuestion: QuizQuestion?
     // ----
     
@@ -72,11 +72,12 @@ final class MovieQuizViewController: UIViewController {
             guard let self = self else { return }
             self.currentQuestionIndex = self.initialQuestionIndex
             self.correctAnswers = self.initialCorrectAnswers
-            guard let currentQuestion = currentQuestion else { return }
             
-            let firstQuestion = currentQuestion
-            let viewModel = self.convert(model: firstQuestion)
-            self.show(quiz: viewModel)
+            if let firstQuestion = questionFactory.requestNextQuestion() {
+                currentQuestion = firstQuestion
+                let viewModel = convert(model: firstQuestion)
+                show(quiz: viewModel)
+            }
         }
         
         alert.addAction(action)
