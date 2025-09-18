@@ -54,12 +54,20 @@ class QuestionFactory: QuestionFactoryProtocol {
                 correctAnswer: false)
         ]
     
+    // В первый раз вызывается в последней строке viewDidLoad() у MovieQuizViewController
     func requestNextQuestion() {
+        
+        // Если нет данных в массиве, то выполнение программы прекращается (6)
         guard let index = (0..<questions.count).randomElement() else {
             delegate?.didReceiveNextQuestion(question: nil)
             return
         }
+        // Если получилось получить индекс случайного элемента на предыдущем шаге, то
+        // заносим в константу question по сути модель QuizQuestion (параллельно проверка идет на наличие элемента с таким индексом в массиве) (7)
         let question = questions[safe: index]
+        
+        // Если получилось занести в question модель, то в случае наличия значения в свойстве delegate (а оно задалось на шаге 3), вызываем у этого значения метод
+        // didReceiveNextQuestion и передаем ему в качестве параметра константу question, получившую значение на предыдущем шаге (8)
         delegate?.didReceiveNextQuestion(question: question)
     }
 }
