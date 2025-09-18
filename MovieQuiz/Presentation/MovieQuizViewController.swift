@@ -40,6 +40,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // Фабрика вопросов
     private var questionFactory: QuestionFactoryProtocol?
     
+    // Класс для отображения алертов
+    private var alertPresenter = AlertPresenter()
+    
     // Текущий вопрос в виде модели (переменная величина)
     private var currentQuestion: QuizQuestion?
     // ----
@@ -122,30 +125,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func show (quiz result: QuizResultsViewModel){
         
-        // На шаге 24 попадаем в этот метод и сразу занимаемся созданием алерта с информацией из переданной модели (24)
-        
-        let alert = UIAlertController(
-            title: result.title,
-            message: result.text,
-            preferredStyle: .alert)
-            
-        // Создаем экшн (код, который будет вызван в результате нажатия единственной кнопки в алерте (25)
-        let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
-            
-            guard let self = self else { return }
-            
-            // Обнуляем текущий номер вопроса (26)
+        let model = AlertModel(title: result.title, message: result.text, buttonText: result.buttonText) { [weak self] in
+            guard let self = self else {return}
+//          self.presenter.restartGame() - по коду из учебника, но пока не очевидно зачем создавать еще какой-то объект презентер и еще метод для него по перезапуску игры
             self.currentQuestionIndex = self.initialQuestionIndex
-            
-            // Обнуляем счетчик правильных ответов (27)
             self.correctAnswers = self.initialCorrectAnswers
-            
-            // Запускаем следующий вопрос с обнуленными параметрами (соответственно новый раунд по сути) (28)
             questionFactory?.requestNextQuestion()
         }
         
-        alert.addAction(action)
-        self.present(alert, animated: true, completion: nil)
+        alertPresenter.show(in: self, model: model)
     }
     
     private func show(quiz step:QuizStepViewModel){
