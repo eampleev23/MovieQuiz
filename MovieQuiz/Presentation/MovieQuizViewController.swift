@@ -5,8 +5,6 @@ import UIKit
 
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
-    
-    
     // Лейбл для отображения текущего номера вопроса
     @IBOutlet private var counterLabel: UILabel!
     
@@ -43,6 +41,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // Класс для отображения алертов
     private var alertPresenter = AlertPresenter()
     
+    // Свойство для объекта класса для сбора общей статистики игр
+    private var statisticService: StatisticServiceProtocol?
+    
     // Текущий вопрос в виде модели (переменная величина)
     private var currentQuestion: QuizQuestion?
     // ----
@@ -57,6 +58,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     override func viewDidLoad() {
         // Сначала вызываем родительский метод (т.е. viewDidLoad метод у класса UIViewController? ) (1)
         super.viewDidLoad()
+        
+        // Создаем объект для сбора информации по общей статистике игр
+        statisticService = StatisticService()
         
         // Создаем фабрику вопросов (2)
         let questionFactory = QuestionFactory()
@@ -127,7 +131,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         let model = AlertModel(title: result.title, message: result.text, buttonText: result.buttonText) { [weak self] in
             guard let self = self else {return}
-//          self.presenter.restartGame() - по коду из учебника, но пока не очевидно зачем создавать еще какой-то объект презентер и еще метод для него по перезапуску игры
             self.currentQuestionIndex = self.initialQuestionIndex
             self.correctAnswers = self.initialCorrectAnswers
             questionFactory?.requestNextQuestion()
@@ -189,7 +192,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             
             // Показываем результат раунда (23)
             // Создаем константу с текстовым значением для алерта (23.1)
-            let text = "Ваш результат: \(correctAnswers)/\(questionsAmount)"
+            
+            statisticService?.store(correct: correctAnswers, total: questionsAmount)
+            
+            let text = """
+            Ваш результат: \(correctAnswers)/\(questionsAmount)
+            Количество сыгранных квизов: \(statisticService?.gamesCount ?? 0)
+            Рекорд: \(statisticService?.bestGame.correct ?? 0)/\(statisticService?.bestGame.total ?? 0) (\(statisticService?.bestGame.date.dateTimeString ?? "дата недоступна"))
+            Средняя точность: \(String(describing: statisticService?.totalAccuracy ?? 0))%
+            """
             
             // создаем модель QuizResultsViewModel и заполняем ее значениями (23.2)
             let viewModel = QuizResultsViewModel(
