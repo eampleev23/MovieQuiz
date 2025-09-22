@@ -80,7 +80,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     func didReceiveNextQuestion(question: QuizQuestion?) {
         // соответственно на шаге 9 приходим сюда
         // проверяем, что question пришел (9)
-        guard let question = question else {
+        guard let question else {
             return
         }
         
@@ -99,14 +99,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         
-        // Срабатывает событие выбора одного из вариантов ответа (13)
-        
-        // Проверяем есть ли currentQuestion (14)
-        guard let currentQuestion = currentQuestion else {
+        guard let currentQuestion else {
             return
         }
         
-        // Вызываем метод showAnswerResult и передаем ему бинарную информацию о правильности ответа (15)
         if currentQuestion.correctAnswer == true {
             showAnswerResult(isCorrect: true)
         }else{
@@ -116,7 +112,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
         
-        guard let currentQuestion = currentQuestion else {
+        guard let currentQuestion else {
             return
         }
         
@@ -157,41 +153,28 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func showAnswerResult(isCorrect: Bool) {
         
-        // На 17 шаге попадаем в этот метод и сначала проверяем правильно ли ответил пользователь.
-        // Если да, то увеличиваем счетчик правильных ответов в раунде (17)
         if isCorrect{
             correctAnswers += 1
         }
         
-        // Отображаем рамку соотвеитствующего цвета (18)
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
         imageView.layer.cornerRadius = 16
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
         
-        // В течение timeForShowBorder секунд
         DispatchQueue.main.asyncAfter(deadline: .now() + timeForShowBorder){ [weak self] in
             
-            // Затем проверяем, что мы в себе и все ок? (19)
-            guard let self = self else { return }
+            guard let self else { return }
             
-            // Если все ок, то убираем рамку (20)
             self.imageView.layer.borderWidth = 0
             
-            // Вызываем метод showNextQuestionOrResults() (21)
             self.showNextQuestionOrResults()
         }
     }
     
     private func showNextQuestionOrResults(){
         
-        // На 22 шаге попадаем в этот метод и делаем проверку
-        // не пытаемся ли мы показать вопрос по счету больший, чем допустимо согласно свойству questionsAmount (22)
-        
         if currentQuestionIndex == questionsAmount - 1 {
-            
-            // Показываем результат раунда (23)
-            // Создаем константу с текстовым значением для алерта (23.1)
             
             statisticService?.store(correct: correctAnswers, total: questionsAmount)
             
@@ -202,18 +185,15 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             Средняя точность: \(String(describing: statisticService?.totalAccuracy ?? 0))%
             """
             
-            // создаем модель QuizResultsViewModel и заполняем ее значениями (23.2)
             let viewModel = QuizResultsViewModel(
                 title: finalTitleAlert,
                 text: text,
                 buttonText: finalBtnAlertText)
             
-            // отображаем результат раунда, вызывая метод show и передавая в него заполненную модель QuizResultsViewModel(23.3)
             show(quiz: viewModel)
         
         } else {
             
-            // Показываем следующий вопрос
             currentQuestionIndex += 1
             self.questionFactory?.requestNextQuestion()
         }
