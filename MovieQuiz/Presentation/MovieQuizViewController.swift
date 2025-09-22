@@ -5,6 +5,12 @@ import UIKit
 
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
+    // Кнопка Да
+    @IBOutlet var yesButton: UIButton!
+    
+    // Кнопка Нет
+    @IBOutlet var noButton: UIButton!
+    
     // Лейбл для отображения текущего номера вопроса
     @IBOutlet private var counterLabel: UILabel!
     
@@ -58,7 +64,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     override func viewDidLoad() {
         // Сначала вызываем родительский метод (т.е. viewDidLoad метод у класса UIViewController? ) (1)
         super.viewDidLoad()
-        
+        btnsSwitchOn(false)
         // Создаем объект для сбора информации по общей статистике игр
         statisticService = StatisticService()
         
@@ -73,6 +79,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         // Обращаемся к фабрике для отображаения случайного вопроса (5)
         questionFactory.requestNextQuestion()
+    }
+    
+    func btnsSwitchOn(_ isEnabled: Bool) {
+        yesButton.isEnabled = isEnabled
+        noButton.isEnabled = isEnabled
     }
     
     // MARK: - QuestionFactoryDelegate
@@ -93,11 +104,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         // отображаем вопрос из главной очереди (12)
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
+            self?.btnsSwitchOn(true)
         }
-        
     }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
+        
+        btnsSwitchOn(false)
         
         guard let currentQuestion else {
             return
@@ -111,6 +124,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
+        
+        btnsSwitchOn(false)
         
         guard let currentQuestion else {
             return
