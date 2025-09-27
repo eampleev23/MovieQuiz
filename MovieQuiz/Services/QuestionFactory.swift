@@ -78,7 +78,6 @@ class QuestionFactory: QuestionFactoryProtocol {
 //                correctAnswer: false)
 //        ]
     
-    // В первый раз вызывается в последней строке viewDidLoad() у MovieQuizViewController
     func requestNextQuestion() {
         
         DispatchQueue.global().async { [weak self] in
@@ -90,8 +89,25 @@ class QuestionFactory: QuestionFactoryProtocol {
             do {
                 let imageData = try Data(contentsOf: movie.imageURL)
                 let rating = Float(movie.rating) ?? 0
-                let text = "Рейтинг этого фильма больше чем 7?"
-                let correctAnswer = rating > 7
+                
+                // Случайный порог от 5.0 до 8.5 с шагом 0.5 для разнообразия
+                let possibleThresholds: [Float] = [8.1, 8.2, 8.3]
+                let threshold = possibleThresholds.randomElement() ?? 7.0
+                
+                // Случайно выбираем тип вопроса - "больше" или "меньше"
+                let isGreaterThanQuestion = Bool.random()
+                
+                let text: String
+                let correctAnswer: Bool
+                
+                if isGreaterThanQuestion {
+                    text = "Рейтинг этого фильма больше чем \(threshold)?"
+                    correctAnswer = rating > threshold
+                } else {
+                    text = "Рейтинг этого фильма меньше чем \(threshold)?"
+                    correctAnswer = rating < threshold
+                }
+                
                 let question = QuizQuestion(image: imageData, text: text, correctAnswer: correctAnswer)
                 
                 DispatchQueue.main.async { [weak self] in
@@ -100,7 +116,7 @@ class QuestionFactory: QuestionFactoryProtocol {
                 }
                 
             } catch {
-                print("Faild to load image")
+                print("Failed to load image")
             }
         }
     }
