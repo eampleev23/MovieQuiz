@@ -22,6 +22,7 @@ class QuestionFactory: QuestionFactoryProtocol {
     
     func loadData() {
             moviesLoader.loadMovies { [weak self] result in
+                // обновляет экран
                 DispatchQueue.main.async{
                     guard let self = self else { return }
                     switch result {
@@ -32,6 +33,7 @@ class QuestionFactory: QuestionFactoryProtocol {
                         self.delegate?.didFailToLoadData(with: error) // сообщаем об ошибке нашему MovieQuizViewController
                     }
                 }
+                
             }
         }
     
@@ -87,6 +89,8 @@ class QuestionFactory: QuestionFactoryProtocol {
             guard let movie = self.movies[safe: index] else { return }
             
             do {
+                // При необходимости задать определенное разрешение картинки
+                // let imageData = try Data(contentsOf: movie.resizedImageURL)
                 let imageData = try Data(contentsOf: movie.imageURL)
                 let rating = Float(movie.rating) ?? 0
                 

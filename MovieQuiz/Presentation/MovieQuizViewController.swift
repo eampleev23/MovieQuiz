@@ -40,7 +40,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         btnsSwitchOn(false)
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         statisticService = StatisticService()
@@ -54,7 +53,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     // MARK: - QuestionFactoryDelegate
-    
     func didReceiveNextQuestion(question: QuizQuestion?) {
 
         guard let question else {
@@ -62,7 +60,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
         
         currentQuestion = question
-        
         let viewModel = convert(model: question)
         
         DispatchQueue.main.async { [weak self] in
@@ -77,7 +74,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     func didFailToLoadData(with error: any Error) {
-        showNetworkError(message: error.localizedDescription)
+//      showNetworkError(message: error.localizedDescription)
+        showNetworkError(message: "Отсутствует соединение с интернетом..")
+        
     }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
@@ -131,7 +130,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             guard let self = self else {return}
             self.currentQuestionIndex = self.initialQuestionIndex
             self.correctAnswers = self.initialCorrectAnswers
-            questionFactory?.requestNextQuestion()
+                questionFactory?.loadData()
         }
         
         alertPresenter.show(in: self, model: model)
