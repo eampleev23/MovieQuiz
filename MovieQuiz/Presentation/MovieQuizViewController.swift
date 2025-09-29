@@ -54,7 +54,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // MARK: - QuestionFactoryDelegate
     func didReceiveNextQuestion(question: QuizQuestion?) {
-
+        
         guard let question else {
             return
         }
@@ -124,11 +124,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             title: "Ошибка",
             message: message,
             buttonText: "Попробовать снова") { [weak self] in
-            guard let self = self else {return}
-            self.currentQuestionIndex = self.initialQuestionIndex
-            self.correctAnswers = self.initialCorrectAnswers
-            questionFactory?.loadData()
-        }
+                guard let self = self else {return}
+                self.currentQuestionIndex = self.initialQuestionIndex
+                self.correctAnswers = self.initialCorrectAnswers
+                questionFactory?.loadData()
+            }
         
         alertPresenter.show(in: self, model: model)
     }
@@ -201,7 +201,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                 buttonText: finalBtnAlertText)
             
             show(quiz: viewModel)
-        
+            
         } else {
             
             currentQuestionIndex += 1
