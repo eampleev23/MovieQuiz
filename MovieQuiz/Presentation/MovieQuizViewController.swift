@@ -74,9 +74,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     func didFailToLoadData(with error: any Error) {
-//      showNetworkError(message: error.localizedDescription)
-        showNetworkError(message: "Отсутствует соединение с интернетом..")
-        
+        showError(message: error.localizedDescription)
     }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
@@ -118,7 +116,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         activityIndicator.isHidden = true
     }
     
-    private func showNetworkError(message: String) {
+    private func showError(message: String) {
         
         hideLoadingIndicator()
         
@@ -126,11 +124,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             title: "Ошибка",
             message: message,
             buttonText: "Попробовать снова") { [weak self] in
-                
             guard let self = self else {return}
             self.currentQuestionIndex = self.initialQuestionIndex
             self.correctAnswers = self.initialCorrectAnswers
-                questionFactory?.loadData()
+            questionFactory?.loadData()
         }
         
         alertPresenter.show(in: self, model: model)

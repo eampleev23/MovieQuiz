@@ -18,10 +18,9 @@ struct MoviesLoader: MoviesLoading {
     private let networkClient = NetworkClient()
     
     // MARK: - URL
-    // Создаем URL и проверяем его на корректность (если не корректный, то завершаем программу с ошибкой)
-    // Хардкодим в него урл к апи (4)
     private var mostPopularMoviesURL: URL {
-        guard let url = URL(string: "https://tv-api.com/en/API/Top250Movies/k_zcuw1ytf") else {
+//        guard let url = URL(string: "https://tv-api.com/en/API/Top250Movies/k_zcuw1ytf") else {
+        guard let url = URL(string: "https://tv-api.com/en/API/Top250Movies/k_zc1uw1ytf") else {
             preconditionFailure("Unable to construct mostPopularMoviesUrl")
         }
         
@@ -29,13 +28,11 @@ struct MoviesLoader: MoviesLoading {
     }
     
     func loadMovies(handler: @escaping (Result<MostPopularMovies, Error>) -> Void) {
-        
         networkClient.fetch(url: mostPopularMoviesURL) { result in
             
             switch result {
                 
             case .success(let data):
-                
                 do {
                     let mostPopularMovies = try JSONDecoder().decode(MostPopularMovies.self, from: data)
                     handler(.success(mostPopularMovies))
