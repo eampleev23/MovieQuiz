@@ -116,7 +116,7 @@ class QuestionFactory: QuestionFactoryProtocol {
                     correctAnswer = rating < threshold
                 }
                 
-                let question = QuizQuestion(image: imageData, text: text, correctAnswer: correctAnswer)
+                let question = QuizQuestion(imageData: imageData, text: text, correctAnswer: correctAnswer)
                 
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
