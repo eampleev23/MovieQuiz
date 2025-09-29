@@ -115,6 +115,9 @@
                                     </stackView>
                                 </subviews>
                             </stackView>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="1VP-uI-TBi">
+                                <rect key="frame" x="210" y="468" width="20" height="20"/>
+                            </activityIndicatorView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" name="YP Black"/>
@@ -127,10 +130,13 @@
                             <constraint firstItem="z8E-Wi-drL" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="10" id="NPw-8U-Qhh"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="z8E-Wi-drL" secondAttribute="bottom" id="bsl-qN-QBO"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="oX0-Dk-tdk" secondAttribute="bottom" id="jnf-Ja-qk2"/>
+                            <constraint firstItem="1VP-uI-TBi" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="ndj-IW-RiS"/>
+                            <constraint firstItem="1VP-uI-TBi" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="oqd-vC-Ual"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="GI1-CN-hdq" secondAttribute="trailing" constant="20" id="wLz-G0-FBo"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="activityIndicator" destination="1VP-uI-TBi" id="NkY-CD-hwr"/>
                         <outlet property="counterLabel" destination="GI1-CN-hdq" id="7ND-xq-pEz"/>
                         <outlet property="imageView" destination="xPl-Cc-We7" id="fwf-Ub-5bM"/>
                         <outlet property="noButton" destination="oX0-Dk-tdk" id="5hV-fI-IMT"/>

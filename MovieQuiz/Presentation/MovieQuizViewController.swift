@@ -1,84 +1,50 @@
 import UIKit
 
-
-// MovieQuizViewController - наследник от UIViewController? + реализует протокол QuestionFactoryDelegate
-
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
-    // Кнопка Да
     @IBOutlet var yesButton: UIButton!
     
-    // Кнопка Нет
     @IBOutlet var noButton: UIButton!
     
-    // Лейбл для отображения текущего номера вопроса
     @IBOutlet private var counterLabel: UILabel!
     
-    // Лейбл для отображения текста вопроса
     @IBOutlet private var textLabel: UILabel!
     
-    // Имэйдж вью для отображения изображения афишы фильма
     @IBOutlet private var imageView: UIImageView!
     
-    // Константы для магических чисел и строк
+    @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
-    // Стартовое значение номера вопроса
     private let initialQuestionIndex = 0
     
-    // Стартовое значение количества правильных ответов
     private let initialCorrectAnswers = 0
     
-    // Сообщение для отображения в результате раунда
     private let finalTitleAlert = "Этот раунд окончен!"
     
-    // Текст на кнопке в конце раунда
     private let finalBtnAlertText = "Сыграть еще раз"
     
-    // Время в секундах сколько показывать результат на каждом шаге перед автоматическим переходом к следующему вопросу квиза
     private let timeForShowBorder = 1.0
-    // ----
     
-    // Общее количество вопросов в раунде
     private let questionsAmount: Int = 10
     
-    // Фабрика вопросов
     private var questionFactory: QuestionFactoryProtocol?
     
-    // Класс для отображения алертов
     private var alertPresenter = AlertPresenter()
     
-    // Свойство для объекта класса для сбора общей статистики игр
     private var statisticService: StatisticServiceProtocol?
     
-    // Текущий вопрос в виде модели (переменная величина)
     private var currentQuestion: QuizQuestion?
-    // ----
     
-    // Номер отображаемого вопроса
     private var currentQuestionIndex = 0
     
-    // Количество правильных ответов в текущем состоянии
     private var correctAnswers = 0
     
-    // viewDidLoad - метод, который отрабатывает после загрузки приложения
     override func viewDidLoad() {
-        // Сначала вызываем родительский метод (т.е. viewDidLoad метод у класса UIViewController? ) (1)
         super.viewDidLoad()
         btnsSwitchOn(false)
-        // Создаем объект для сбора информации по общей статистике игр
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         statisticService = StatisticService()
-        
-        // Создаем фабрику вопросов (2)
-        let questionFactory = QuestionFactory()
-        
-        // Ставим себя делегатом для фабрики (3)
-        questionFactory.delegate = self
-        
-        // Заносим созданную фабрику с собой в виде делегата к себе в свойство questionFactory (4)
-        self.questionFactory = questionFactory
-        
-        // Обращаемся к фабрике для отображаения случайного вопроса (5)
-        questionFactory.requestNextQuestion()
+        showLoadingIndicator()
+        questionFactory?.loadData()
     }
     
     func btnsSwitchOn(_ isEnabled: Bool) {
@@ -87,25 +53,28 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     // MARK: - QuestionFactoryDelegate
-    
     func didReceiveNextQuestion(question: QuizQuestion?) {
-        // соответственно на шаге 9 приходим сюда
-        // проверяем, что question пришел (9)
+        
         guard let question else {
             return
         }
         
-        // присваиваем свойству currentQuestion значение пришедшего question (10)
         currentQuestion = question
-        
-        // создаем модель для отображения вопроса (11)
         let viewModel = convert(model: question)
         
-        // отображаем вопрос из главной очереди (12)
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
             self?.btnsSwitchOn(true)
         }
+    }
+    
+    func didLoadDataFromServer() {
+        activityIndicator.isHidden = true
+        questionFactory?.requestNextQuestion()
+    }
+    
+    func didFailToLoadData(with error: any Error) {
+        showError(message: error.localizedDescription)
     }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
@@ -138,6 +107,32 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
+    private func showLoadingIndicator() {
+        activityIndicator.isHidden = false
+        activityIndicator.startAnimating()
+    }
+    
+    private func hideLoadingIndicator(){
+        activityIndicator.isHidden = true
+    }
+    
+    private func showError(message: String) {
+        
+        hideLoadingIndicator()
+        
+        let model = AlertModel(
+            title: "Ошибка",
+            message: message,
+            buttonText: "Попробовать снова") { [weak self] in
+                guard let self = self else {return}
+                self.currentQuestionIndex = self.initialQuestionIndex
+                self.correctAnswers = self.initialCorrectAnswers
+                questionFactory?.loadData()
+            }
+        
+        alertPresenter.show(in: self, model: model)
+    }
+    
     private func show (quiz result: QuizResultsViewModel){
         
         let model = AlertModel(title: result.title, message: result.text, buttonText: result.buttonText) { [weak self] in
@@ -159,7 +154,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func convert(model:QuizQuestion) -> QuizStepViewModel {
         let questionStep = QuizStepViewModel(
-            image: UIImage(named: model.image) ?? UIImage(),
+            image: UIImage(data: model.imageData) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
         return questionStep
@@ -206,7 +201,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                 buttonText: finalBtnAlertText)
             
             show(quiz: viewModel)
-        
+            
         } else {
             
             currentQuestionIndex += 1
