@@ -15,7 +15,11 @@ struct MoviesLoader: MoviesLoading {
     
     // MARK: - NetworkClient
     // Создаем NetworkClient и не запускаем никаких методов (3)
-    private let networkClient = NetworkClient()
+    private let networkClient: NetworkRouting
+    
+    init(networkClient: NetworkRouting = NetworkClient()) {
+        self.networkClient = networkClient
+    }
     
     // MARK: - URL
     private var mostPopularMoviesURL: URL {
