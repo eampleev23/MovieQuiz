@@ -49,6 +49,7 @@
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xPl-Cc-We7" userLabel="Preview Image">
                                         <rect key="frame" x="80" y="43.666666666666686" width="240" height="360"/>
                                         <color key="backgroundColor" name="YP White"/>
+                                        <accessibility key="accessibilityConfiguration" identifier="Poster"/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="xPl-Cc-We7" secondAttribute="height" multiplier="2:3" id="8KW-Gq-uvu"/>
                                         </constraints>
@@ -90,6 +91,7 @@
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="w7T-8E-Jhr" userLabel="Yes button">
                                                 <rect key="frame" x="210" y="0.0" width="190" height="60"/>
                                                 <color key="backgroundColor" name="YP White"/>
+                                                <accessibility key="accessibilityConfiguration" identifier="Yes"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="60" id="52Q-gN-b28"/>
                                                 </constraints>
