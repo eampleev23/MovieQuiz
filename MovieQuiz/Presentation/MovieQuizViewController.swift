@@ -123,7 +123,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         let model = AlertModel(
             title: "Ошибка",
             message: message,
-            buttonText: "Попробовать снова") { [weak self] in
+            buttonText: "Попробовать снова",
+            identifier: "errorAlert") { [weak self] in
                 guard let self = self else {return}
                 self.currentQuestionIndex = self.initialQuestionIndex
                 self.correctAnswers = self.initialCorrectAnswers
@@ -135,7 +136,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private func show (quiz result: QuizResultsViewModel){
         
-        let model = AlertModel(title: result.title, message: result.text, buttonText: result.buttonText) { [weak self] in
+        let model = AlertModel(title: result.title, message: result.text, buttonText: result.buttonText, identifier: "roundResults") { [weak self] in
             guard let self = self else {return}
             self.currentQuestionIndex = self.initialQuestionIndex
             self.correctAnswers = self.initialCorrectAnswers

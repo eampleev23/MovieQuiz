@@ -78,4 +78,35 @@ final class MovieQuizUITests: XCTestCase {
         XCTAssertNotEqual(firstPosterData, secondPosterData)
         XCTAssertEqual(indexLabel.label, "2/10")
     }
+    
+    func testContentAlertAfterRaund() {
+        sleep(3)
+        
+        for _ in 0..<10{
+            app.buttons["No"].tap() // Находим кнопку "Нет" и нажимаем ее
+            sleep(3)
+        }
+        
+        let alert = app.alerts["roundResults"]
+        let title = alert.label
+        let message = alert.staticTexts.element(boundBy: 1).label
+        
+        XCTAssertTrue(alert.exists)
+        XCTAssertEqual(title, "Этот раунд окончен!")
+        XCTAssertTrue(message.contains("Ваш результат:"))
+        XCTAssertTrue(message.contains("Количество сыгранных квизов:"))
+        XCTAssertTrue(message.contains("Рекорд:"))
+        XCTAssertTrue(message.contains("Средняя точность:"))
+        
+        let resultPattern = "\\d+/\\d+"
+        let resultRange = message.range(of: resultPattern, options: .regularExpression)
+        XCTAssertNotNil(resultRange, "Результат должен быть в формате 'число/число'")
+        
+        let accuracyPattern = "\\d+%"
+        let accuracyRange = message.range(of: accuracyPattern, options: .regularExpression)
+        XCTAssertNotNil(accuracyRange, "Точность должна быть в формате 'число%'")
+        
+        let goMoreButton = alert.buttons["Сыграть еще раз"]
+        XCTAssertEqual(goMoreButton.label, "Сыграть еще раз")
+    }
 }
