@@ -34,22 +34,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         noButton.isEnabled = isEnabled
     }
     
-    // MARK: - QuestionFactoryDelegate
-    func didReceiveNextQuestion(question: QuizQuestion?) {
-        
-        guard let question else {
-            return
-        }
-
-        presenter.currentQuestion = question
-        let viewModel = presenter.convert(model: question)
-        
-        DispatchQueue.main.async { [weak self] in
-            self?.show(quiz: viewModel)
-            self?.btnsSwitchOn(true)
-        }
-    }
-    
     func didLoadDataFromServer() {
         activityIndicator.isHidden = true
         questionFactory?.requestNextQuestion()
@@ -57,6 +41,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     func didFailToLoadData(with error: any Error) {
         showError(message: error.localizedDescription)
+    }
+    
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+        btnsSwitchOn(true)
+        presenter.didReceiveNextQuestion(question: question)
     }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
@@ -110,7 +99,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         alertPresenter.show(in: self, model: model)
     }
     
-    private func show(quiz step:QuizStepViewModel){
+    func show(quiz step:QuizStepViewModel){
         
         imageView.image = step.image
         textLabel.text = step.question
