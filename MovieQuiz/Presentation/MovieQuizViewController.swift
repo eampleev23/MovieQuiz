@@ -3,35 +3,20 @@ import UIKit
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     @IBOutlet var yesButton: UIButton!
-    
     @IBOutlet var noButton: UIButton!
-    
     @IBOutlet private var counterLabel: UILabel!
-    
     @IBOutlet private var textLabel: UILabel!
-    
     @IBOutlet private var imageView: UIImageView!
-    
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
-    
     private let initialQuestionIndex = 0
-    
     private let initialCorrectAnswers = 0
-    
     private let finalTitleAlert = "Этот раунд окончен!"
-    
     private let finalBtnAlertText = "Сыграть еще раз"
-    
     private let timeForShowBorder = 1.0
-    
     private let presenter = MovieQuizPresenter()
-    
     private var questionFactory: QuestionFactoryProtocol?
-    
     private var alertPresenter = AlertPresenter()
-    
     private var statisticService: StatisticServiceProtocol?
-    
     private var correctAnswers = 0
     
     override func viewDidLoad() {
