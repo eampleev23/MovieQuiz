@@ -32,8 +32,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     private var statisticService: StatisticServiceProtocol?
     
-    private var currentQuestion: QuizQuestion?
-    
     private var correctAnswers = 0
     
     override func viewDidLoad() {
@@ -41,6 +39,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         btnsSwitchOn(false)
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         statisticService = StatisticService()
+        presenter.viewController = self
         showLoadingIndicator()
         questionFactory?.loadData()
     }
@@ -56,8 +55,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         guard let question else {
             return
         }
-        
-        currentQuestion = question
+
+        presenter.currentQuestion = question
         let viewModel = presenter.convert(model: question)
         
         DispatchQueue.main.async { [weak self] in
@@ -78,31 +77,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         
         btnsSwitchOn(false)
-        
-        guard let currentQuestion else {
-            return
-        }
-        
-        if currentQuestion.correctAnswer == true {
-            showAnswerResult(isCorrect: true)
-        }else{
-            showAnswerResult(isCorrect: false)
-        }
+        presenter.yesButtonClicked()
     }
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
         
         btnsSwitchOn(false)
-        
-        guard let currentQuestion else {
-            return
-        }
-        
-        if currentQuestion.correctAnswer == false {
-            showAnswerResult(isCorrect: true)
-        }else{
-            showAnswerResult(isCorrect: false)
-        }
+        presenter.noButtonClicked()
     }
     
     private func showLoadingIndicator() {
@@ -151,7 +132,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         counterLabel.text = step.questionNumber
     }
     
-    private func showAnswerResult(isCorrect: Bool) {
+    func showAnswerResult(isCorrect: Bool) {
         
         if isCorrect{
             correctAnswers += 1
