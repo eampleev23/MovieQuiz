@@ -28,6 +28,7 @@ final class MovieQuizPresenter {
     
     func resetQuestionIndex() {
         currentQuestionIndex = 0
+        correctAnswers = 0
     }
     
     func switchToNextQuestion() {
@@ -62,6 +63,12 @@ final class MovieQuizPresenter {
     
     func noButtonClicked() {
         didAnswer(isYes: false)
+    }
+    
+    func didAnswer(isCorrect: Bool){
+        if isCorrect {
+            correctAnswers += 1
+        }
     }
     
     private func didAnswer(isYes: Bool) {

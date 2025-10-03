@@ -17,7 +17,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var questionFactory: QuestionFactoryProtocol?
     private var alertPresenter = AlertPresenter()
     private var statisticService: StatisticServiceProtocol?
-    private var correctAnswers = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -80,7 +79,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             identifier: "errorAlert") { [weak self] in
                 guard let self = self else {return}
                 presenter.resetQuestionIndex()
-                self.correctAnswers = self.initialCorrectAnswers
                 questionFactory?.loadData()
             }
         
@@ -92,7 +90,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         let model = AlertModel(title: result.title, message: result.text, buttonText: result.buttonText, identifier: "roundResults") { [weak self] in
             guard let self = self else {return}
             presenter.resetQuestionIndex()
-            self.correctAnswers = self.initialCorrectAnswers
             questionFactory?.requestNextQuestion()
         }
         
@@ -108,9 +105,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     func showAnswerResult(isCorrect: Bool) {
         
-        if isCorrect{
-            correctAnswers += 1
-        }
+        presenter.didAnswer(isCorrect: isCorrect)
         
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
@@ -121,7 +116,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             
             guard let self else { return }
             self.imageView.layer.borderWidth = 0
-            self.presenter.correctAnswers = self.correctAnswers
             self.presenter.questionFactory = self.questionFactory
             self.presenter.statisticService = self.statisticService
             self.presenter.showNextQuestionOrResults()
@@ -132,8 +126,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         if presenter.isLastQuestion() {
             
-            statisticService?.store(correct: correctAnswers, total: presenter.questionsAmount)
-            self.presenter.correctAnswers = self.correctAnswers
+            statisticService?.store(correct: presenter.correctAnswers, total: presenter.questionsAmount)
             self.presenter.questionFactory = self.questionFactory
             self.presenter.statisticService = self.statisticService
             presenter.showNextQuestionOrResults()
