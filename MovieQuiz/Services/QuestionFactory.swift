@@ -16,22 +16,28 @@ final class QuestionFactory: QuestionFactoryProtocol {
     init(moviesLoader: MoviesLoading, delegate: QuestionFactoryDelegate?) {
         self.moviesLoader = moviesLoader
         self.delegate = delegate
+        print("В фабрике инициализировали moviesLoader и delegate")
     }
     
     private var movies: [MostPopularMovie] = []
     
     func loadData() {
+        print("Вызываем moviesLoader.loadMovies и передаем ему замыкание DispatchQueue.main.async")
         moviesLoader.loadMovies { [weak self] result in
             // обновляет экран
             DispatchQueue.main.async{
+                print("Выполняется замыкание DispatchQueue.main.async")
                 guard let self = self else { return }
                 switch result {
                 case .success(let mostPopularMovies):
+                    print("Проверяем, что не пустая строка")
                     if mostPopularMovies.errorMessage != "" {
                         let err = AppError.internalAppError
                         self.delegate?.didFailToLoadData(with: err)
                     }
+                    print("QuestionFactory self.movies = mostPopularMovies.items ")
                     self.movies = mostPopularMovies.items // сохраняем фильмы в нашу новую переменную
+                    print("QuestionFactory Вызываем self.delegate?.didLoadDataFromServer()")
                     self.delegate?.didLoadDataFromServer() // сообщаем, что данные загрузились
                 case .failure(let error):
                     self.delegate?.didFailToLoadData(with: error) // сообщаем об ошибке нашему MovieQuizViewController
@@ -41,61 +47,32 @@ final class QuestionFactory: QuestionFactoryProtocol {
         }
     }
     
-    //    private let questions: [QuizQuestion] = [
-    //            QuizQuestion(
-    //                image: "The Godfather",
-    //                text: "Рейтинг этого фильма больше чем 6?",
-    //                correctAnswer: true),
-    //            QuizQuestion(
-    //                image: "The Dark Knight",
-    //                text: "Рейтинг этого фильма больше чем 6?",
-    //                correctAnswer: true),
-    //            QuizQuestion(
-    //                image: "Kill Bill",
-    //                text: "Рейтинг этого фильма больше чем 6?",
-    //                correctAnswer: true),
-    //            QuizQuestion(
-    //                image: "The Avengers",
-    //                text: "Рейтинг этого фильма больше чем 6?",
-    //                correctAnswer: true),
-    //            QuizQuestion(
-    //                image: "Deadpool",
-    //                text: "Рейтинг этого фильма больше чем 6?",
-    //                correctAnswer: true),
-    //            QuizQuestion(
-    //                image: "The Green Knight",
-    //                text: "Рейтинг этого фильма больше чем 6?",
-    //                correctAnswer: true),
-    //            QuizQuestion(
-    //                image: "Old",
-    //                text: "Рейтинг этого фильма больше чем 6?",
-    //                correctAnswer: false),
-    //            QuizQuestion(
-    //                image: "The Ice Age Adventures of Buck Wild",
-    //                text: "Рейтинг этого фильма больше чем 6?",
-    //                correctAnswer: false),
-    //            QuizQuestion(
-    //                image: "Tesla",
-    //                text: "Рейтинг этого фильма больше чем 6?",
-    //                correctAnswer: false),
-    //            QuizQuestion(
-    //                image: "Vivarium",
-    //                text: "Рейтинг этого фильма больше чем 6?",
-    //                correctAnswer: false)
-    //        ]
-    
     func requestNextQuestion() {
+        print("requestNextQuestion в QuestionFactory")
+        
+        print("Вызываем DispatchQueue.global().async { [weak self] in")
         
         DispatchQueue.global().async { [weak self] in
+            
+            print("Начинает отрабатывать DispatchQueue.global().async { [weak self] in")
             guard let self = self else { return }
+            
+            print("Определяем случайный нормер вопроса")
             let index = (0..<self.movies.count).randomElement() ?? 0
             
+            print("Определяем что не вышли за рамки массива")
             guard let movie = self.movies[safe: index] else { return }
             
             do {
+                print("Блок do { для получения картинки")
                 // При необходимости задать определенное разрешение картинки
                 // let imageData = try Data(contentsOf: movie.resizedImageURL)
+                print("Загружаем картинку")
                 let imageData = try Data(contentsOf: movie.imageURL)
+                print("Здесь уже загрузили, но пока не отобразили")
+                
+                print("Генерируем случайный вопрос")
+                
                 let rating = Float(movie.rating) ?? 0
                 
                 // Случайный порог от 5.0 до 8.5 с шагом 0.5 для разнообразия
@@ -116,10 +93,14 @@ final class QuestionFactory: QuestionFactoryProtocol {
                     correctAnswer = rating < threshold
                 }
                 
+                print("Создаем модель QuizQuestion")
                 let question = QuizQuestion(imageData: imageData, text: text, correctAnswer: correctAnswer)
                 
+                print("Вызываем DispatchQueue.main.async { [weak self] !!! ")
                 DispatchQueue.main.async { [weak self] in
+                    print("Попали в переданное замыкание !!!")
                     guard let self = self else { return }
+                    print("Вызываем метод презентера didReceiveNextQuestion и передаем ему модель QuizQuestion")
                     self.delegate?.didReceiveNextQuestion(question: question)
                 }
                 

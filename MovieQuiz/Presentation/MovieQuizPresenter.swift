@@ -8,9 +8,10 @@
 import Foundation
 import UIKit
 
-final class MovieQuizPresenter {
+final class MovieQuizPresenter: QuestionFactoryDelegate {
     
-    weak var viewController: MovieQuizViewController?
+    private weak var viewController: MovieQuizViewController?
+    private var questionFactory: QuestionFactoryProtocol?
     
     let questionsAmount: Int = 10
     let finalTitleAlert = "Этот раунд окончен!"
@@ -19,20 +20,74 @@ final class MovieQuizPresenter {
     var correctAnswers: Int = 0
     var currentQuestionIndex: Int = 0
     var currentQuestion: QuizQuestion?
-    var questionFactory: QuestionFactoryProtocol?
     var statisticService: StatisticServiceProtocol?
     
+    init(viewController: MovieQuizViewController) {
+        
+        print("Попали в конструктор презентера")
+        
+        self.viewController = viewController
+        
+        print("Создаем фабрику...")
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
+        
+        print("Создали фабрику, запускаем прелоадер")
+        viewController.showLoadingIndicator()
+        
+        print("Запускаем questionFactory?.loadData()")
+        questionFactory?.loadData()
+    }
+    
+    // MARK: - QuestionFactoryDelegate
+    
+    func didLoadDataFromServer() {
+        
+        print("presenter didLoadDataFromServer начинает работу")
+        viewController?.hideLoadIndicator()
+        
+        print("questionFactory?.requestNextQuestion()")
+        questionFactory?.requestNextQuestion()
+    }
+    
+    func didFailToLoadData(with error: any Error) {
+        let message = error.localizedDescription
+        viewController?.showError(message: message)
+    }
+    
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+        
+        print("Попали в метод презентера didReceiveNextQuestion")
+        
+        guard let question else {
+            return
+        }
+
+        print("Занесли переданную модель вопроса в currentQuestion")
+        currentQuestion = question
+        
+        print("конвертируем ее в модель для вьюхи")
+        let viewModel = convert(model: question)
+        
+        print("Асинхронно вызываем метод отображения вопроса self?.viewController?.show(quiz: viewModel)")
+        DispatchQueue.main.async { [weak self] in
+            self?.viewController?.show(quiz: viewModel)
+        }
+    }
+
     func isLastQuestion() -> Bool {
         return currentQuestionIndex == questionsAmount - 1
     }
     
-    func resetQuestionIndex() {
+    func restartGame() {
         currentQuestionIndex = 0
         correctAnswers = 0
+        questionFactory?.requestNextQuestion()
+//        questionFactory?.loadData()?
     }
     
     func switchToNextQuestion() {
         currentQuestionIndex += 1
+        questionFactory?.requestNextQuestion()
     }
     
     func convert(model:QuizQuestion) -> QuizStepViewModel {
@@ -43,19 +98,7 @@ final class MovieQuizPresenter {
         return questionStep
     }
     
-    func didReceiveNextQuestion(question: QuizQuestion?) {
-        
-        guard let question else {
-            return
-        }
 
-        currentQuestion = question
-        let viewModel = convert(model: question)
-        
-        DispatchQueue.main.async { [weak self] in
-            self?.viewController?.show(quiz: viewModel)
-        }
-    }
     
     func yesButtonClicked() {
         didAnswer(isYes: true)

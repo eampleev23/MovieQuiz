@@ -31,13 +31,23 @@ struct MoviesLoader: MoviesLoading {
     }
     
     func loadMovies(handler: @escaping (Result<MostPopularMovies, Error>) -> Void) {
+        
+        print("Метод loadMovies начинает работать у которого в качестве аргумента замыкание  DispatchQueue.main.async")
+        print("Вызывается метод fetch у networkClient с url, которому передается замыкание  switch result decode")
+        
         networkClient.fetch(url: mostPopularMoviesURL) { result in
+            
+        print("Попали в замыкание на switch result")
             
             switch result {
                 
             case .success(let data):
+                
+                print("Попали в case .success")
+                print("Пробуем парсить  do { try в не созданную модель MostPopularMovies.self, но сохраняем в переменную mostPopularMovies результат в случае успеха")
                 do {
                     let mostPopularMovies = try JSONDecoder().decode(MostPopularMovies.self, from: data)
+                    print("Вызываем переданное замыкание уже распарсенным .success(mostPopularMovies)")
                     handler(.success(mostPopularMovies))
                 } catch {
                     handler(.failure(error))
