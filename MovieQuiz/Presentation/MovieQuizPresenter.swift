@@ -10,10 +10,17 @@ import UIKit
 
 final class MovieQuizPresenter {
     
+    weak var viewController: MovieQuizViewController?
+    
     let questionsAmount: Int = 10
+    let finalTitleAlert = "Этот раунд окончен!"
+    let finalBtnAlertText = "Сыграть еще раз"
+    
+    var correctAnswers: Int = 0
     var currentQuestionIndex: Int = 0
     var currentQuestion: QuizQuestion?
-    weak var viewController: MovieQuizViewController?
+    var questionFactory: QuestionFactoryProtocol?
+    var statisticService: StatisticServiceProtocol?
     
     func isLastQuestion() -> Bool {
         return currentQuestionIndex == questionsAmount - 1
@@ -66,5 +73,28 @@ final class MovieQuizPresenter {
         let givenAnswer = isYes
         
         viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+    }
+    
+    func showNextQuestionOrResults(){
+        
+        if self.isLastQuestion() {
+            
+            let text = """
+            Ваш результат: \(correctAnswers)/\(self.questionsAmount)
+            Количество сыгранных квизов: \(statisticService?.gamesCount ?? 0)
+            Рекорд: \(statisticService?.bestGame.correct ?? 0)/\(statisticService?.bestGame.total ?? 0) (\(statisticService?.bestGame.date.dateTimeString ?? "дата недоступна"))
+            Средняя точность: \(String(describing: statisticService?.totalAccuracy ?? 0))%
+            """
+            
+            let viewModel = QuizResultsViewModel(
+                title: finalTitleAlert,
+                text: text,
+                buttonText: finalBtnAlertText)
+                viewController?.show(quiz: viewModel)
+            
+        } else {
+            self.switchToNextQuestion()
+            questionFactory?.requestNextQuestion()
+        }
     }
 }

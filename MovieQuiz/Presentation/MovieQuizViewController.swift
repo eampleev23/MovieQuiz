@@ -87,7 +87,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         alertPresenter.show(in: self, model: model)
     }
     
-    private func show (quiz result: QuizResultsViewModel){
+    func show (quiz result: QuizResultsViewModel){
         
         let model = AlertModel(title: result.title, message: result.text, buttonText: result.buttonText, identifier: "roundResults") { [weak self] in
             guard let self = self else {return}
@@ -120,10 +120,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + timeForShowBorder){ [weak self] in
             
             guard let self else { return }
-            
             self.imageView.layer.borderWidth = 0
-            
-            self.showNextQuestionOrResults()
+            self.presenter.correctAnswers = self.correctAnswers
+            self.presenter.questionFactory = self.questionFactory
+            self.presenter.statisticService = self.statisticService
+            self.presenter.showNextQuestionOrResults()
         }
     }
     
@@ -132,20 +133,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         if presenter.isLastQuestion() {
             
             statisticService?.store(correct: correctAnswers, total: presenter.questionsAmount)
-            
-            let text = """
-            Ваш результат: \(correctAnswers)/\(presenter.questionsAmount)
-            Количество сыгранных квизов: \(statisticService?.gamesCount ?? 0)
-            Рекорд: \(statisticService?.bestGame.correct ?? 0)/\(statisticService?.bestGame.total ?? 0) (\(statisticService?.bestGame.date.dateTimeString ?? "дата недоступна"))
-            Средняя точность: \(String(describing: statisticService?.totalAccuracy ?? 0))%
-            """
-            
-            let viewModel = QuizResultsViewModel(
-                title: finalTitleAlert,
-                text: text,
-                buttonText: finalBtnAlertText)
-            
-            show(quiz: viewModel)
+            self.presenter.correctAnswers = self.correctAnswers
+            self.presenter.questionFactory = self.questionFactory
+            self.presenter.statisticService = self.statisticService
+            presenter.showNextQuestionOrResults()
             
         } else {
 
