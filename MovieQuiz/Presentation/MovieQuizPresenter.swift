@@ -20,32 +20,22 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     var correctAnswers: Int = 0
     var currentQuestionIndex: Int = 0
     var currentQuestion: QuizQuestion?
-    var statisticService: StatisticServiceProtocol?
+    private let statisticService: StatisticServiceProtocol!
     
     init(viewController: MovieQuizViewController) {
-        
-        print("Попали в конструктор презентера")
-        
+
         self.viewController = viewController
-        
-        print("Создаем фабрику...")
+        statisticService = StatisticService()
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
-        
-        print("Создали фабрику, запускаем прелоадер")
         viewController.showLoadingIndicator()
-        
-        print("Запускаем questionFactory?.loadData()")
         questionFactory?.loadData()
     }
     
     // MARK: - QuestionFactoryDelegate
     
     func didLoadDataFromServer() {
-        
-        print("presenter didLoadDataFromServer начинает работу")
+
         viewController?.hideLoadIndicator()
-        
-        print("questionFactory?.requestNextQuestion()")
         questionFactory?.requestNextQuestion()
     }
     
@@ -56,19 +46,13 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     func didReceiveNextQuestion(question: QuizQuestion?) {
         
-        print("Попали в метод презентера didReceiveNextQuestion")
-        
         guard let question else {
             return
         }
 
-        print("Занесли переданную модель вопроса в currentQuestion")
         currentQuestion = question
-        
-        print("конвертируем ее в модель для вьюхи")
         let viewModel = convert(model: question)
         
-        print("Асинхронно вызываем метод отображения вопроса self?.viewController?.show(quiz: viewModel)")
         DispatchQueue.main.async { [weak self] in
             self?.viewController?.show(quiz: viewModel)
         }
@@ -82,10 +66,10 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         currentQuestionIndex = 0
         correctAnswers = 0
         questionFactory?.requestNextQuestion()
-//        questionFactory?.loadData()?
     }
     
     func switchToNextQuestion() {
+        
         currentQuestionIndex += 1
         questionFactory?.requestNextQuestion()
     }
@@ -115,7 +99,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     }
     
     private func didAnswer(isYes: Bool) {
-        
         guard let currentQuestion else {
             return
         }
@@ -144,7 +127,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             
         } else {
             self.switchToNextQuestion()
-            questionFactory?.requestNextQuestion()
         }
     }
+    
 }

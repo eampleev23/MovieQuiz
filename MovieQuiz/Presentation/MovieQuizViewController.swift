@@ -20,7 +20,6 @@ final class MovieQuizViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         statisticService = StatisticService()
-        print("Создали statisticService и запускаем конструктор presenter")
         presenter = MovieQuizPresenter(viewController: self)
     }
     
@@ -78,19 +77,15 @@ final class MovieQuizViewController: UIViewController {
     
     func show(quiz step:QuizStepViewModel){
         
-        print("Попали в MovieQuizViewController show(quiz step:QuizStepViewModel)")
         imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
-        
-        print("Отображаем все сразу через 3 сек, т.е. по завершению работы функции show")
-        sleep(3)
+        btnsSwitchOn(true)
     }
     
     func showAnswerResult(isCorrect: Bool) {
         
         presenter.didAnswer(isCorrect: isCorrect)
-        
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
         imageView.layer.cornerRadius = 16
@@ -100,8 +95,6 @@ final class MovieQuizViewController: UIViewController {
             
             guard let self else { return }
             self.imageView.layer.borderWidth = 0
-            self.presenter.showNextQuestionOrResults()
-            self.presenter.statisticService = self.statisticService
             self.presenter.showNextQuestionOrResults()
         }
     }
@@ -115,7 +108,6 @@ final class MovieQuizViewController: UIViewController {
         if presenter.isLastQuestion() {
             
             statisticService?.store(correct: presenter.correctAnswers, total: presenter.questionsAmount)
-            self.presenter.statisticService = self.statisticService
             presenter.showNextQuestionOrResults()
             
         } else {
