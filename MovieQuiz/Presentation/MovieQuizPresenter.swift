@@ -10,25 +10,25 @@ import UIKit
 
 final class MovieQuizPresenter: QuestionFactoryDelegate {
     
-    private weak var viewController: MovieQuizViewController?
-    private var questionFactory: QuestionFactoryProtocol?
+    private let questionsAmount: Int = 10
+    private let finalTitleAlert = "Этот раунд окончен!"
+    private let finalBtnAlertText = "Сыграть еще раз"
     
-    let questionsAmount: Int = 10
-    let finalTitleAlert = "Этот раунд окончен!"
-    let finalBtnAlertText = "Сыграть еще раз"
-    
-    var correctAnswers: Int = 0
-    var currentQuestionIndex: Int = 0
-    var currentQuestion: QuizQuestion?
     private let statisticService: StatisticServiceProtocol!
+    private var questionFactory: QuestionFactoryProtocol?
+    private weak var viewController: MovieQuizViewController?
+    
+    private var correctAnswers: Int = 0
+    private var currentQuestionIndex: Int = 0
+    var currentQuestion: QuizQuestion?
     
     init(viewController: MovieQuizViewController) {
         
         self.viewController = viewController
         statisticService = StatisticService()
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
-        viewController.showLoadingIndicator()
         questionFactory?.loadData()
+        viewController.showLoadingIndicator()
     }
     
     // MARK: - QuestionFactoryDelegate
