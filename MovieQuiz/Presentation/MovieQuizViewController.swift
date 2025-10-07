@@ -17,40 +17,34 @@ final class MovieQuizViewController: UIViewController {
     private var alertPresenter = AlertPresenter()
     private var statisticService: StatisticServiceProtocol?
     
-    // viewDidLoad запускается сразу после загрузки экрана
     override func viewDidLoad() {
         super.viewDidLoad()
         statisticService = StatisticService()
         presenter = MovieQuizPresenter(viewController: self)
     }
-        
-    // yesButtonClicked запускается после нажатия на кнопку ДА
+    
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         
         btnsSwitchOn(false)
         presenter.yesButtonClicked()
     }
     
-    // noButtonClicked запускается после нажатия на кнопку НЕТ
     @IBAction private func noButtonClicked(_ sender: UIButton) {
         
         btnsSwitchOn(false)
         presenter.noButtonClicked()
     }
     
-    // btnsSwitchOn используется в presenter для того чтобы включить или выключить возможность нажатия на кнопки ДА и НЕТ
     func btnsSwitchOn(_ isEnabled: Bool) {
         yesButton.isEnabled = isEnabled
         noButton.isEnabled = isEnabled
     }
     
-    // showLoadingIndicator используется для отображения индикатора загрузки
     func showLoadingIndicator() {
         activityIndicator.startAnimating()
         activityIndicator.isHidden = false
     }
     
-    // hideLoadingIndicator используется для скрытия индикатора загрузки
     func hideLoadingIndicator(){
         activityIndicator.stopAnimating()
         activityIndicator.isHidden = true
@@ -64,7 +58,6 @@ final class MovieQuizViewController: UIViewController {
         imageView.layer.borderColor = isCorrectAnswer ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
     }
     
-    // showError используется для отображения ошибки
     func showError(message: String) {
         
         hideLoadingIndicator()
@@ -81,54 +74,21 @@ final class MovieQuizViewController: UIViewController {
         alertPresenter.show(in: self, model: model)
     }
     
-    // show(quiz result: QuizResultsViewModel) используется для отображения результатов квиза
     func show(quiz result: QuizResultsViewModel){
         
         let model = AlertModel(title: result.title, message: result.text, buttonText: result.buttonText, identifier: "roundResults") { [weak self] in
             guard let self = self else {return}
             presenter.restartGame()
         }
-        
         alertPresenter.show(in: self, model: model)
     }
     
-    // show(quiz step:QuizStepViewModel) используется для отображения очередного вопроса
     func show(quiz step:QuizStepViewModel){
         
         imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
         btnsSwitchOn(true)
+        imageView.layer.borderWidth = 0
     }
-    
-    // showAnswerResult(isCorrect: Bool) используется для отображения результатов ответа на один из вопросов
-    //    func showAnswerResult(isCorrect: Bool) {
-    //
-    //        presenter.didAnswer(isCorrectAnswer: isCorrect)
-    //        imageView.layer.masksToBounds = true
-    //        imageView.layer.borderWidth = 8
-    //        imageView.layer.cornerRadius = 16
-    //        imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-    //
-    //        DispatchQueue.main.asyncAfter(deadline: .now() + timeForShowBorder){ [weak self] in
-    //
-    //            guard let self else { return }
-    //            self.imageView.layer.borderWidth = 0
-    //            self.presenter.showNextQuestionOrResults()
-    //        }
-    //    }
-    
-    // showNextQuestionOrResults отображает следующий вопрос или результаты через презентера
-    //    private func showNextQuestionOrResults(){
-    //        
-    //        if presenter.isLastQuestion() {
-    //            
-    //            statisticService?.store(correct: presenter.correctAnswers, total: presenter.questionsAmount)
-    //            presenter.showNextQuestionOrResults()
-    //            
-    //        } else {
-    //            
-    //            presenter.switchToNextQuestion()
-    //        }
-    //    }
 }

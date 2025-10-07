@@ -23,7 +23,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     private let statisticService: StatisticServiceProtocol!
     
     init(viewController: MovieQuizViewController) {
-
+        
         self.viewController = viewController
         statisticService = StatisticService()
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
@@ -33,25 +33,21 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     // MARK: - QuestionFactoryDelegate
     
-    // didLoadDataFromServer запускается после загрузки успешной загрузки данных
     func didLoadDataFromServer() {
         viewController?.hideLoadingIndicator()
         questionFactory?.requestNextQuestion()
     }
     
-    // didFailToLoadData запускается невозможности загрузить данные
     func didFailToLoadData(with error: any Error) {
         let message = error.localizedDescription
         viewController?.showError(message: message)
     }
     
-    // didReceiveNextQuestion запускается в случае успешной загрузки данных об очередном вопросе
     func didReceiveNextQuestion(question: QuizQuestion?) {
-        
         guard let question else {
             return
         }
-
+        
         currentQuestion = question
         let viewModel = convert(model: question)
         
@@ -59,28 +55,23 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             self?.viewController?.show(quiz: viewModel)
         }
     }
-
-    // isLastQuestion возвращает данные о том последний ли вопрос сейчас отображен
+    
     func isLastQuestion() -> Bool {
         return currentQuestionIndex == questionsAmount - 1
     }
     
-    // restartGame перезапускает игру
     func restartGame() {
         currentQuestionIndex = 0
         correctAnswers = 0
         questionFactory?.requestNextQuestion()
     }
     
-    // switchToNextQuestion отображает следующий вопрос
     func switchToNextQuestion() {
         
         currentQuestionIndex += 1
         questionFactory?.requestNextQuestion()
     }
     
-    
-    // convert конвертирует модель QuizQuestion в модель QuizStepViewModel
     func convert(model:QuizQuestion) -> QuizStepViewModel {
         let questionStep = QuizStepViewModel(
             image: UIImage(data: model.imageData) ?? UIImage(),
@@ -89,25 +80,21 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         return questionStep
     }
     
-    // yesButtonClicked вызывается во вью контроллере при нажатии на кнопку да
     func yesButtonClicked() {
         didAnswer(isYes: true)
     }
     
-    // noButtonClicked вызывается во вью контроллере при нажатии на кнопку нет
     func noButtonClicked() {
         didAnswer(isYes: false)
     }
     
-    // didAnswer вызывается только во вью контроллере
-    func didAnswer(isCorrectAnswer: Bool){
+    func updateCorrectAnswers(isCorrectAnswer: Bool){
         if isCorrectAnswer {
             correctAnswers += 1
         }
     }
     
-    // Отображает результаты квиза или вызывает свой switchToNextQuestion
-    func showNextQuestionOrResults(){
+    func continueWithNextQuestionOrShowResults() {
         
         if self.isLastQuestion() {
             
@@ -122,34 +109,34 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
                 title: finalTitleAlert,
                 text: text,
                 buttonText: finalBtnAlertText)
-                viewController?.show(quiz: viewModel)
+            viewController?.show(quiz: viewModel)
             
         } else {
+            
             self.switchToNextQuestion()
         }
     }
     
-    func showAnswerResult(isCorrect: Bool) {
-        didAnswer(isCorrectAnswer: isCorrect)
+    func answerHandler(isCorrect: Bool) {
+        
+        updateCorrectAnswers(isCorrectAnswer: isCorrect)
         viewController?.highlightImageBorder(isCorrectAnswer: isCorrect)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             
             guard let self else { return }
-            self.showNextQuestionOrResults()
+            self.continueWithNextQuestionOrShowResults()
         }
     }
     
-    // didAnswer вызывается в noButtonClicked yesButtonClicked здесь, в презентере
     private func didAnswer(isYes: Bool) {
+        
         guard let currentQuestion else {
             return
         }
         
         let givenAnswer = isYes
-        
-//        viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        answerHandler(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
 }
