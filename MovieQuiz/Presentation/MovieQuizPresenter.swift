@@ -131,6 +131,8 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     private func didAnswer(isYes: Bool) {
         
+        viewController?.btnsSwitchOn(false)
+        
         guard let currentQuestion else {
             return
         }

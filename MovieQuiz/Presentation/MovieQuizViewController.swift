@@ -2,17 +2,13 @@ import UIKit
 
 final class MovieQuizViewController: UIViewController {
     
-    @IBOutlet var yesButton: UIButton!
-    @IBOutlet var noButton: UIButton!
+    @IBOutlet private var yesButton: UIButton!
+    @IBOutlet private var noButton: UIButton!
     @IBOutlet private var counterLabel: UILabel!
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
-    private let initialQuestionIndex = 0
-    private let initialCorrectAnswers = 0
-    private let finalTitleAlert = "Этот раунд окончен!"
-    private let finalBtnAlertText = "Сыграть еще раз"
-    private let timeForShowBorder = 1.0
+    
     private var presenter: MovieQuizPresenter!
     private var alertPresenter = AlertPresenter()
     private var statisticService: StatisticServiceProtocol?
@@ -24,14 +20,10 @@ final class MovieQuizViewController: UIViewController {
     }
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
-        
-        btnsSwitchOn(false)
         presenter.yesButtonClicked()
     }
     
     @IBAction private func noButtonClicked(_ sender: UIButton) {
-        
-        btnsSwitchOn(false)
         presenter.noButtonClicked()
     }
     
