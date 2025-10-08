@@ -89,7 +89,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
             message: message,
             buttonText: "Попробовать снова",
             identifier: "errorAlert") { [weak self] in
-                guard let self = self else {return}
+                guard let self else {return}
                 presenter.restartRound()
             }
         

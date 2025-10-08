@@ -7,11 +7,11 @@
 
 import Foundation
 
-import XCTest // не забывайте импортировать фреймворк для тестирования
-@testable import MovieQuiz // импортируем наше приложение для тестирования
+import XCTest
+@testable import MovieQuiz
 
-class ArrayTests: XCTestCase {
-    func testGetValueInRange() throws -> Void { // тест на успешное взятие элемента по индексу
+final class ArrayTests: XCTestCase {
+    func testGetValueInRange() throws -> Void {
         // Given
         let array = [1, 1, 2, 3, 5]
         
@@ -23,7 +23,7 @@ class ArrayTests: XCTestCase {
         XCTAssertEqual(value, 2)
     }
     
-    func testGetValueOutOfRange() throws { // тест на взятие элемента по неправильному индексу
+    func testGetValueOutOfRange() throws {
         // Given
         let array = [1, 1, 2, 3, 5]
         

@@ -22,7 +22,6 @@ final class QuestionFactory: QuestionFactoryProtocol {
     
     func loadData() {
         moviesLoader.loadMovies { [weak self] result in
-            // обновляет экран
             DispatchQueue.main.async{
                 guard let self = self else { return }
                 switch result {
@@ -31,10 +30,10 @@ final class QuestionFactory: QuestionFactoryProtocol {
                         let err = AppError.internalAppError
                         self.delegate?.didFailToLoadData(with: err)
                     }
-                    self.movies = mostPopularMovies.items // сохраняем фильмы в нашу новую переменную
-                    self.delegate?.didLoadDataFromServer() // сообщаем, что данные загрузились
+                    self.movies = mostPopularMovies.items
+                    self.delegate?.didLoadDataFromServer()
                 case .failure(let error):
-                    self.delegate?.didFailToLoadData(with: error) // сообщаем об ошибке нашему MovieQuizViewController
+                    self.delegate?.didFailToLoadData(with: error)
                 }
             }
             
@@ -51,15 +50,13 @@ final class QuestionFactory: QuestionFactoryProtocol {
             guard let movie = self.movies[safe: index] else { return }
             
             do {
-                // При необходимости задать определенное разрешение картинки
+                
                 let imageData = try Data(contentsOf: movie.imageURL)
                 let rating = Float(movie.rating) ?? 0
                 
-                // Случайный порог от 5.0 до 8.5 с шагом 0.5 для разнообразия
                 let possibleThresholds: [Float] = [8.1, 8.2, 8.3]
                 let threshold = possibleThresholds.randomElement() ?? 7.0
                 
-                // Случайно выбираем тип вопроса - "больше" или "меньше"
                 let isGreaterThanQuestion = Bool.random()
                 
                 let text: String

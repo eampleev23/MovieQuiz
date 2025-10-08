@@ -11,6 +11,10 @@ import UIKit
 final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     private let questionsAmount: Int = 10
+    private let stepValue: Int = 1
+    private let timeToShowBorder = 1.0
+    private let initCorrectAnswers = 0
+    private let initCurrentQuestionIndex = 0
     private let finalTitleAlert = "Этот раунд окончен!"
     private let finalBtnAlertText = "Сыграть еще раз"
     
@@ -57,18 +61,17 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     }
     
     func isLastQuestion() -> Bool {
-        return currentQuestionIndex == questionsAmount - 1
+        currentQuestionIndex == questionsAmount - stepValue
     }
     
     func restartRound() {
-        currentQuestionIndex = 0
-        correctAnswers = 0
+        currentQuestionIndex = initCurrentQuestionIndex
+        correctAnswers = initCorrectAnswers
         questionFactory?.requestNextQuestion()
     }
     
     func switchToNextQuestion() {
-        
-        currentQuestionIndex += 1
+        currentQuestionIndex += stepValue
         questionFactory?.requestNextQuestion()
     }
     
@@ -76,7 +79,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         let questionStep = QuizStepViewModel(
             image: UIImage(data: model.imageData) ?? UIImage(),
             question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
+            questionNumber: "\(currentQuestionIndex + stepValue)/\(questionsAmount)")
         return questionStep
     }
     
@@ -95,13 +98,11 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     }
     
     func continueWithNextQuestionOrShowResults() {
-        
         if self.isLastQuestion() {
-            
             let text = """
             Ваш результат: \(correctAnswers)/\(self.questionsAmount)
             Количество сыгранных квизов: \(statisticService?.gamesCount ?? 0)
-            Рекорд: \(statisticService?.bestGame.correct ?? 0)/\(statisticService?.bestGame.total ?? 0) (\(statisticService?.bestGame.date.dateTimeString ?? "дата недоступна"))
+            Рекорд: \(statisticService?.bestGame.correct ?? 0)/\(statisticService?.bestGame.total ?? 0)\n (\(statisticService?.bestGame.date.dateTimeString ?? "дата недоступна"))
             Средняя точность: \(String(describing: statisticService?.totalAccuracy ?? 0))%
             """
             
@@ -110,19 +111,17 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
                 text: text,
                 buttonText: finalBtnAlertText)
             viewController?.show(quiz: viewModel)
-            
         } else {
-            
             self.switchToNextQuestion()
         }
     }
     
-    func answerHandler(isCorrect: Bool) {
+    private func answerHandler(isCorrect: Bool) {
         
         updateCorrectAnswers(isCorrectAnswer: isCorrect)
         viewController?.highlightImageBorder(isCorrectAnswer: isCorrect)
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + timeToShowBorder) { [weak self] in
             
             guard let self else { return }
             self.continueWithNextQuestionOrShowResults()
