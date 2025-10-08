@@ -14,8 +14,11 @@ protocol MoviesLoading {
 struct MoviesLoader: MoviesLoading {
     
     // MARK: - NetworkClient
-    // Создаем NetworkClient и не запускаем никаких методов (3)
-    private let networkClient = NetworkClient()
+    private let networkClient: NetworkRouting
+    
+    init(networkClient: NetworkRouting = NetworkClient()) {
+        self.networkClient = networkClient
+    }
     
     // MARK: - URL
     private var mostPopularMoviesURL: URL {
@@ -27,8 +30,8 @@ struct MoviesLoader: MoviesLoading {
     }
     
     func loadMovies(handler: @escaping (Result<MostPopularMovies, Error>) -> Void) {
+        
         networkClient.fetch(url: mostPopularMoviesURL) { result in
-            
             switch result {
                 
             case .success(let data):
