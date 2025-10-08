@@ -51,7 +51,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
                 
                 guard let self = self else {return}
                 
-                presenter.restartGame()
+                presenter.restartRound()
             }
         
         alertPresenter.show(in: self, model: model)
@@ -90,7 +90,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
             buttonText: "Попробовать снова",
             identifier: "errorAlert") { [weak self] in
                 guard let self = self else {return}
-                presenter.restartGame()
+                presenter.restartRound()
             }
         
         alertPresenter.show(in: self, model: model)

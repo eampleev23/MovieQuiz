@@ -60,7 +60,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         return currentQuestionIndex == questionsAmount - 1
     }
     
-    func restartGame() {
+    func restartRound() {
         currentQuestionIndex = 0
         correctAnswers = 0
         questionFactory?.requestNextQuestion()

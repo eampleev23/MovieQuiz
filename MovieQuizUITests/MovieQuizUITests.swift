@@ -79,7 +79,7 @@ final class MovieQuizUITests: XCTestCase {
         XCTAssertEqual(indexLabel.label, "2/10")
     }
     
-    func testContentAlertAfterRaund() {
+    func testContentAlertAfterRaundAndSucessRoundRestart() {
         sleep(3)
         
         for _ in 0..<10{
@@ -108,5 +108,11 @@ final class MovieQuizUITests: XCTestCase {
         
         let goMoreButton = alert.buttons["Сыграть еще раз"]
         XCTAssertEqual(goMoreButton.label, "Сыграть еще раз")
+        
+        goMoreButton.tap()
+        XCTAssertFalse(alert.waitForExistence(timeout: 2))
+        
+        let indexLabel = app.staticTexts["Index"]
+        XCTAssertEqual(indexLabel.label, "1/10")
     }
 }
