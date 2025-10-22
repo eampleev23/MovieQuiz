@@ -27,6 +27,7 @@ final class QuestionFactory: QuestionFactoryProtocol {
                 switch result {
                 case .success(let mostPopularMovies):
                     if mostPopularMovies.errorMessage != "" {
+                        print("mostPopularMovies.errorMessage = \(mostPopularMovies.errorMessage)")
                         let err = AppError.internalAppError
                         self.delegate?.didFailToLoadData(with: err)
                     }
